@@ -95,9 +95,7 @@ public class ShockUtil implements SensorEventListener {
     private int verseCount = 0;//翻转计数器，>=1时，触发振动
     @Override
     public void onSensorChanged (SensorEvent sensorEvent) {
-        if (sensorEvent.sensor == null) {
-            return;
-        }
+        if (sensorEvent.sensor == null) return;
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             //----------------横向手机------------------------
             //屏幕朝上（0,   0,  10）
@@ -109,6 +107,7 @@ public class ShockUtil implements SensorEventListener {
             int x = (int) sensorEvent.values[0];
             int y = (int) sensorEvent.values[1];
             int z = (int) sensorEvent.values[2];
+            Log.e(TAG,x+" ,"+y+" ,"+z+" ");
             //在时间间隔内翻转了，verseCount++，计数大于1，振动
             shake(z,x);
             lastX = x;
@@ -131,15 +130,13 @@ public class ShockUtil implements SensorEventListener {
         if (isOpen) {//开启振动
             switch (shock_style) {
                 case SHAKE_SHOCK://摇一摇
-                    if (z * lastZ < 0 || x * lastX < 0)
-                    {
+                    if (z * lastZ < 0 || x * lastX < 0) {
                         realShock();
                     }
                     else verseCount = 0;
                     break;
                 case VERSE_SHOCK://翻一翻
-                    if (z * lastZ < 0 && Math.abs(lastZ*z) > 50)
-                    {
+                    if (z * lastZ < 0 && Math.abs(lastZ * z) > 50) {
                         realShock();
                     }
                     else verseCount = 0;
@@ -162,6 +159,7 @@ public class ShockUtil implements SensorEventListener {
                 if (null == lisener) return;
                 lisener.onShockResult();
                 isOpen = false;//关闭振动
+                mSensorManager.unregisterListener(this,mSensor);
                 return;
             }
             verseCount++;
